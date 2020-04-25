@@ -1,0 +1,441 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.1
+-- Dumped by pg_dump version 12.1
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: film; Type: TABLE; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE TABLE public.film (
+    kod_filmu character varying(10) NOT NULL,
+    rodzaj_filmu character varying(20),
+    tytul character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.film OWNER TO arturkowalczyk;
+
+--
+-- Name: rodzaje; Type: TABLE; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE TABLE public.rodzaje (
+    rodzaj character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.rodzaje OWNER TO arturkowalczyk;
+
+--
+-- Name: klienci; Type: TABLE; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE TABLE public.klienci (
+    klient_id integer NOT NULL,
+    imie character varying(20) NOT NULL,
+    nazwisko character varying(20) NOT NULL,
+    "e-mail" character varying(40) NOT NULL,
+    nr_telefonu character varying(40) NOT NULL,
+    unique ("e-mail"),
+    unique (nr_telefonu),
+    check(imie ~'.+' and nazwisko ~'.+' and "e-mail" ~'.+' and nr_telefonu ~'.+')
+);
+
+
+ALTER TABLE public.klienci OWNER TO arturkowalczyk;
+
+--
+-- Name: klienci_klient_id_seq; Type: SEQUENCE; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE SEQUENCE public.klienci_klient_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.klienci_klient_id_seq OWNER TO arturkowalczyk;
+
+--
+-- Name: klienci_klient_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER SEQUENCE public.klienci_klient_id_seq OWNED BY public.klienci.klient_id;
+
+
+--
+-- Name: rodzaje; Type: TABLE; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE TABLE public.rodzaje (
+    rodzaj character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.rodzaje OWNER TO arturkowalczyk;
+
+
+--
+-- Name: seans; Type: TABLE; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE TABLE public.seans (
+    kod_seansu integer NOT NULL,
+    kod_filmu character varying(10) NOT NULL,
+    nr_sali integer NOT NULL,
+    data date NOT NULL,
+    czas_rozpoczecia time without time zone NOT NULL,
+    czas_zakonczenia time without time zone NOT NULL
+);
+
+
+ALTER TABLE public.seans OWNER TO arturkowalczyk;
+
+--
+-- Name: seans_kod_seansu_seq; Type: SEQUENCE; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE SEQUENCE public.seans_kod_seansu_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seans_kod_seansu_seq OWNER TO arturkowalczyk;
+
+--
+-- Name: seans_kod_seansu_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER SEQUENCE public.seans_kod_seansu_seq OWNED BY public.seans.kod_seansu;
+
+
+--
+-- Name: tworcy; Type: TABLE; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE TABLE public.tworcy (
+    kod_filmu character varying(10) NOT NULL,
+    rezyser character varying(40) NOT NULL,
+    scenariusz character varying(40) NOT NULL,
+    obsada text
+);
+
+
+ALTER TABLE public.tworcy OWNER TO arturkowalczyk;
+
+--
+-- Name: zarezerwowane_miejsca; Type: TABLE; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE TABLE public.zarezerwowane_miejsca (
+    kod_seansu integer NOT NULL,
+    numer_miejsca character varying(3) NOT NULL,
+    klient_id integer NOT NULL,
+    pin character varying(4) NOT NULL,
+    unique (kod_seansu, numer_miejsca)
+);
+
+
+ALTER TABLE public.zarezerwowane_miejsca OWNER TO arturkowalczyk;
+
+--
+-- Name: klienci klient_id; Type: DEFAULT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.klienci ALTER COLUMN klient_id SET DEFAULT nextval('public.klienci_klient_id_seq'::regclass);
+
+
+--
+-- Name: seans kod_seansu; Type: DEFAULT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.seans ALTER COLUMN kod_seansu SET DEFAULT nextval('public.seans_kod_seansu_seq'::regclass);
+
+
+--
+-- Data for Name: film; Type: TABLE DATA; Schema: public; Owner: arturkowalczyk
+--
+
+COPY public.film (kod_filmu, rodzaj_filmu, tytul) FROM stdin;
+A152	Sci-Fi	Gwiezdne wojny: Skywalker. Odrodzenie
+b739	horror	Czarne święta
+hg65	dramat	Osierocony Brooklyn
+b87h	dokumentalny	Kraina miodu
+sc65	dramat	Dwóch papieży
+k653	thriller	Kod Dedala
+u762	biograficzny	Oficer i szpieg
+k567	fantasy	Jumanji: Następny poziom
+l543	dramat	Tajemnica Henriego Picka
+z12h	dramat	Last Christmas
+m123	komedia	Futro z misia
+c701	fantasy	Kraina Lodu 2
+j91g	dramat	Pan T.
+v819	romans	Jak poślubić milionera
+j182	przygodowy	Młody renifer Alex
+k777	animowany	Śnieżna paczka
+p098	dramat	Joker
+\.
+
+
+--
+-- Data for Name: klienci; Type: TABLE DATA; Schema: public; Owner: arturkowalczyk
+--
+
+COPY public.klienci (klient_id, imie, nazwisko, "e-mail", nr_telefonu) FROM stdin;
+1	artur	kowalczyk	art@dsad.com	660123123
+\.
+
+
+--
+-- Data for Name: rodzaje; Type: TABLE DATA; Schema: public; Owner: arturkowalczyk
+--
+
+COPY public.rodzaje (rodzaj) FROM stdin;
+Sci-Fi
+przygodowy
+akcji
+horror
+thriller
+familijny
+animowany
+historyczny
+kostiumowy
+romans
+komedia
+dokumentalny
+dramat
+biograficzny
+fantasy
+\.
+
+
+
+--
+-- Data for Name: seans; Type: TABLE DATA; Schema: public; Owner: arturkowalczyk
+--
+
+COPY public.seans (kod_seansu, kod_filmu, nr_sali, data, czas_rozpoczecia, czas_zakonczenia) FROM stdin;
+1	b739	10	2020-02-01	12:30:00	14:25:00
+2	z12h	10	2020-02-01	09:15:00	10:30:00
+3	m123	10	2020-02-01	15:30:00	16:45:00
+4	c701	10	2020-02-01	18:20:00	20:00:00
+5	j91g	10	2020-02-02	08:20:00	10:00:00
+6	k777	10	2020-02-02	10:10:00	12:00:00
+7	sc65	10	2020-02-02	13:15:00	15:00:00
+8	l543	10	2020-02-02	16:00:00	17:30:00
+9	l543	10	2020-02-03	08:15:00	09:55:00
+10	k777	10	2020-02-03	10:25:00	12:00:00
+11	v819	10	2020-02-03	12:25:00	14:00:00
+12	l543	10	2020-02-03	15:00:00	17:05:00
+13	hg65	10	2020-02-04	08:15:00	10:05:00
+14	A152	10	2020-02-04	11:00:00	12:45:00
+15	b87h	10	2020-02-04	13:00:00	15:00:00
+16	l543	10	2020-02-04	16:10:00	17:00:00
+18	z12h	10	2020-02-05	10:05:00	11:50:00
+19	l543	10	2020-02-05	12:25:00	13:40:00
+20	v819	10	2020-02-05	14:25:00	15:40:00
+21	p098	10	2020-02-05	20:00:00	22:20:00
+17	m123	10	2020-02-04	20:10:00	22:00:00
+\.
+
+
+--
+-- Data for Name: tworcy; Type: TABLE DATA; Schema: public; Owner: arturkowalczyk
+--
+
+COPY public.tworcy (kod_filmu, rezyser, scenariusz, obsada) FROM stdin;
+A152	J.J. Abrams	J.J. Abrams, Chris Terrio	Daisy Ridley, John Boyega, Carrie Fisher, Adam Driver, Mark Hamill
+b739	Sophia Takal	Sophia Takal, April Wolfe	Imogen Poots, Cary Elwes, Simon Mead, Caleb Eberhardt, Zoe Robins
+hg65	Edward Norton	Edward Norton	Edward Norton, Bruce Willis, Gugu Mbatha-Raw, Bobby Cannavale, Cherry Jones, Alec Baldwin, Willem Dafoe
+b87h	Tamara Kotewska, Ljubomir Stefanow	Ljubomir Stefanow	 Hatidze Muratova, Nazife Muratova, Hussein Sam, Ljutvie Sam, Mustafa Sam
+sc65	 Fernando Meirelles	Anthony McCarten	Jonathan Pryce, Anthony Hopkins
+k653	Régis Roinsard	Régis Roinsard	Alex Lawther, Olga Kurylenko, Lambert Wilson, Sidse Babett Knudsen, Anna Maria Sturm
+u762	Roman Polański	Robert HarrisRoman Polański	Jean Dujardin, Louis Garrel, Emmanuelle Seigner, Grégory Gadebois
+k567	Jake Kasdan	Dwayne Johnson, Jake Kasdan	Karen Gillan, Dwayne Johnson, Kevin Hart
+l543	Rémi Bezançon	 Rémi Bezançon, Vanessa Portal	Fabrice Luchini, Camille Cottin, Alice Isaaz
+z12h	Paul Feig	Emma ThompsonBryony Kimmings	Emilia Clarke, Henry Golding, Emma Thompson, Michelle Yeoh
+m123	 Michał Milowicz, Kacper Anuszewski	Paweł Bilski, Olaf Lubaszenko	 Izabella Miko
+c701	Jennifer Lee, Chris Buck	 Jennifer Lee, Allison Schroeder	Idina Menzel, Kristen Bell, Josh Gad
+j91g	 Marcin Krzyształowicz	 Marcin Krzyształowicz, Andrzej Gołda	Paweł Wilczak
+v819	Filip Zylber	Pieter Kramer, Mischa Alexander	Małgorzata Socha, Michał Malinowski
+j182	Guillaume Maidatchevsky	Morgan Navarro, Marko Rohr	 Peter Franzén, Aldebert
+k777	Aaron Woodley	Bob Barlen, Cal Brunker	Jeremy Renner, Heidi Klum, James Franco
+p098	Todd Phillips	Todd Phillips, Scott Silver	Joaquin Phoenix, Robert De Niro, Zazie Beetz, Frances Conroy
+\.
+
+
+--
+-- Data for Name: rodzaje; Type: TABLE DATA; Schema: public; Owner: arturkowalczyk
+--
+
+COPY public.rodzaje (rodzaj) FROM stdin;
+Sci-Fi
+przygodowy
+akcji
+horror
+thriller
+familijny
+animowany
+historyczny
+kostiumowy
+romans
+komedia
+dokumentalny
+dramat
+biograficzny
+fantasy
+\.
+
+
+
+--
+-- Name: klienci_klient_id_seq; Type: SEQUENCE SET; Schema: public; Owner: arturkowalczyk
+--
+
+SELECT pg_catalog.setval('public.klienci_klient_id_seq', 20, true);
+
+
+--
+-- Name: seans_kod_seansu_seq; Type: SEQUENCE SET; Schema: public; Owner: arturkowalczyk
+--
+
+SELECT pg_catalog.setval('public.seans_kod_seansu_seq', 1, false);
+
+
+--
+-- Name: film film_pkey; Type: CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.film
+    ADD CONSTRAINT film_pkey PRIMARY KEY (kod_filmu);
+
+
+--
+-- Name: film film_tytul_key; Type: CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.film
+    ADD CONSTRAINT film_tytul_key UNIQUE (tytul);
+
+
+--
+-- Name: klienci klienci_pkey; Type: CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.klienci
+    ADD CONSTRAINT klienci_pkey PRIMARY KEY (klient_id);
+
+
+--
+-- Name: rodzaje rodzaje_pkey; Type: CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.rodzaje
+    ADD CONSTRAINT rodzaje_pkey PRIMARY KEY (rodzaj)
+--
+-- Name: seans seans_pkey; Type: CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.seans
+    ADD CONSTRAINT seans_pkey PRIMARY KEY (kod_seansu);
+
+
+--
+-- Name: tworcy tworcy_pkey; Type: CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.tworcy
+    ADD CONSTRAINT tworcy_pkey PRIMARY KEY (kod_filmu);
+
+
+--
+-- Name: fg_k; Type: INDEX; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE INDEX fg_k ON public.film USING btree (rodzaj_filmu);
+
+
+--
+-- Name: rodzaje rodzaje_pkey; Type: CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.rodzaje
+    ADD CONSTRAINT rodzaje_pkey PRIMARY KEY (rodzaj);
+
+
+
+--
+-- Name: fg_key; Type: INDEX; Schema: public; Owner: arturkowalczyk
+--
+
+CREATE INDEX fg_key ON public.seans USING btree (kod_filmu);
+
+
+--
+-- Name: film film_rodzaj_filmu_fkey; Type: FK CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.film
+    ADD CONSTRAINT film_rodzaj_filmu_fkey FOREIGN KEY (rodzaj_filmu) REFERENCES public.rodzaje(rodzaj) ON UPDATE CASCADE ON DELETE CASCADE NOT VALID;
+
+
+--
+-- Name: seans seans_kod_filmu_fkey; Type: FK CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.seans
+    ADD CONSTRAINT seans_kod_filmu_fkey FOREIGN KEY (kod_filmu) REFERENCES public.film(kod_filmu) ON UPDATE CASCADE ON DELETE CASCADE NOT VALID;
+
+
+--
+-- Name: tworcy tworcy_kod_filmu_fkey; Type: FK CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.tworcy
+    ADD CONSTRAINT tworcy_kod_filmu_fkey FOREIGN KEY (kod_filmu) REFERENCES public.film(kod_filmu) ON UPDATE CASCADE ON DELETE CASCADE NOT VALID;
+
+
+--
+-- Name: zarezerwowane_miejsca zarezerwowane_miejsca_klient_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.zarezerwowane_miejsca
+    ADD CONSTRAINT zarezerwowane_miejsca_klient_id_fkey FOREIGN KEY (klient_id) REFERENCES public.klienci(klient_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: zarezerwowane_miejsca zarezerwowane_miejsca_klient_id_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: arturkowalczyk
+--
+
+ALTER TABLE ONLY public.zarezerwowane_miejsca
+    ADD CONSTRAINT zarezerwowane_miejsca_klient_id_fkey1 FOREIGN KEY (klient_id) REFERENCES public.klienci(klient_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--

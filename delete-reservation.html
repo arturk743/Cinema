@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="initial-scale=1.0">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="http://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body>
+
+	<section id='start'></section>
+
+	<nav class="navbar navbar-default navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                  <a class="navbar-brand" href="http://localhost">Kino</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                  <ul class="nav navbar-nav navbar-right">
+
+                    <li><a href="http://localhost/#seanse">Seanse</a></li>
+										<li><a href="http://localhost/moje-zamowienia.html">Moje zamowienia</a></li>
+
+                  </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+		</nav>
+
+
+
+
+		<div class="calendar" >
+
+		</div>
+
+    <!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+<div class="modal-dialog">
+
+  <!-- Modal content-->
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h4 class="modal-title">Kino</h4>
+    </div>
+    <div class="modal-body">
+      <p class="modal-body-p">Successfully deleted selected seat.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+    <script>
+      $('#myModal').modal({ show: false})
+      function createTable(){
+      var obj = JSON.parse(sessionStorage.reservation);
+      console.log(obj);
+      var i;
+
+      var seans = jQuery('<div class="seans"></div>').html("<font size=15>"+obj.tytul+"<br></font>" +
+      "<font size=10>"+obj.data+"     "+obj.czas_rozpoczecia+"<br></font>");
+      $(".calendar").append(seans);
+
+      var table = jQuery('<ul></ul>');
+      $(".seans").append(table);
+
+
+      for(i = 0; i < obj.zarezerwowane_miejsca.length; i++){
+        var li = jQuery('<li></li>');
+        li.attr('id',obj.zarezerwowane_miejsca[i]);
+        var seat = jQuery('<div class="film"></div>').html("<span>"+obj.zarezerwowane_miejsca[i]+"</span>");
+        var delete_button = jQuery('<div class="kup_bilet"></div>').html("<a><span>Usuń miejsce</span></a>");
+        delete_button.attr('seat',obj.zarezerwowane_miejsca[i]);
+        delete_button.attr("onclick", "deleteSeatFromReservation(this)");
+        li.append(seat);
+        li.append(delete_button);
+        $('.seans ul').append(li);
+
+      }
+    }
+    function deleteSeatFromReservation(seat){
+      var url="http://localhost/delete-reservation.php";
+      var obj = JSON.parse(sessionStorage.reservation);
+      var data = new FormData();
+      data.append('seat', seat.getAttribute('seat'));
+      data.append('pin', sessionStorage.getItem('pin'));
+      data.append('kod_seansu', obj.kod_seansu);
+
+      // data.append('seat', this.getAttribute("seat"));
+      // data.append('pin', pin);
+      //
+      //
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          // obj = JSON.parse(this.responseText);
+          obj = this.responseText;
+          console.log(obj);
+          if (obj == 1){
+            $('#'+seat.getAttribute('seat')).remove();
+            $('#myModal').modal('show');
+          } else {
+            console.log("Błąd usuwania miejsca");
+          }
+        }
+      };
+      xmlhttp.open("POST", url, true);
+      xmlhttp.send(data);
+
+    }
+
+    createTable();
+
+
+
+    </script>
+
+
+
+</body>
+</html>
